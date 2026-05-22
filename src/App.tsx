@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Wrench, LogOut, Download, Share2, X, Eye, EyeOff } from 'lucide-react';
+import { FileText, Wrench, LogOut, Download, Share2, X, Eye, EyeOff, Settings, Lock } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Certificate } from './types';
 import { generateCertificatePDF } from './utils/pdfGenerator';
@@ -9,10 +9,11 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   // Hardcoded credentials for proxy authentication
   const USERNAME = 'Francisco';
-  const PASSWORD = 'Franciscoaragão637';
+  const defaultPassword = 'Franciscoaragão637';
 
   useEffect(() => {
     const localAuth = localStorage.getItem('francisco_auth');
@@ -28,7 +29,9 @@ export default function App() {
     const userStr = String(formData.get('username') || '').trim();
     const passStr = String(formData.get('password') || '').trim();
 
-    if (userStr.toLowerCase() === USERNAME.toLowerCase() && passStr === PASSWORD) {
+    const savedPassword = localStorage.getItem('francisco_password') || defaultPassword;
+
+    if (userStr.toLowerCase() === USERNAME.toLowerCase() && passStr === savedPassword) {
       if (rememberMe) {
         localStorage.setItem('francisco_auth', 'true');
       }
@@ -141,15 +144,104 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mt-0.5">Oficina Premium</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="text-zinc-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition-all" title="Sair do Sistema">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button onClick={() => setShowSettings(true)} className="text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 p-2.5 rounded-xl transition-all" title="Configurações (Alterar Senha)">
+              <Settings className="w-5 h-5" />
+            </button>
+            <button onClick={handleLogout} className="text-zinc-400 hover:text-red-600 hover:bg-red-50 p-2.5 rounded-xl transition-all" title="Sair do Sistema">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CertificateForm />
       </main>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} defaultPassword={defaultPassword} />}
+    </div>
+  );
+}
+
+function SettingsModal({ onClose, defaultPassword }: { onClose: () => void, defaultPassword: string }) {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const savedPassword = localStorage.getItem('francisco_password') || defaultPassword;
+    
+    if (currentPassword !== savedPassword) {
+      alert('A senha atual está incorreta!');
+      return;
+    }
+    
+    if (newPassword.trim().length < 4) {
+      alert('A nova senha deve ter pelo menos 4 caracteres.');
+      return;
+    }
+    
+    localStorage.setItem('francisco_password', newPassword.trim());
+    alert('Senha alterada com sucesso!');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="px-6 py-5 border-b border-zinc-100 bg-zinc-50 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+             <div className="bg-zinc-200 p-2 rounded-full">
+                <Lock className="w-5 h-5 text-zinc-700" />
+             </div>
+             <h3 className="text-lg font-bold text-zinc-900 tracking-tight">Alterar Senha</h3>
+          </div>
+          <button onClick={onClose} className="text-zinc-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-full transition-all">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1.5 uppercase tracking-wide">Senha Atual</label>
+            <div className="relative">
+              <input 
+                type={showCurrent ? 'text' : 'password'} 
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="block w-full rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 pr-12 text-zinc-900 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 transition-colors shadow-sm" 
+                required 
+              />
+              <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 hover:text-zinc-600 transition-colors">
+                {showCurrent ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-semibold text-zinc-600 mb-1.5 uppercase tracking-wide">Nova Senha</label>
+            <div className="relative">
+              <input 
+                type={showNew ? 'text' : 'password'} 
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="block w-full rounded-xl border border-zinc-200 bg-zinc-50/50 p-3 pr-12 text-zinc-900 focus:border-red-500 focus:bg-white focus:ring-1 focus:ring-red-500 transition-colors shadow-sm" 
+                required 
+              />
+              <button type="button" onClick={() => setShowNew(!showNew)} className="absolute inset-y-0 right-0 flex items-center pr-4 text-zinc-400 hover:text-zinc-600 transition-colors">
+                {showNew ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" className="w-full flex justify-center py-3 px-4 mt-2 rounded-xl shadow-md text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-all active:scale-[0.98] uppercase tracking-wider">
+            Salvar Nova Senha
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
