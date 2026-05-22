@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Wrench, LogOut, Download, Share2, X, Eye, EyeOff, Settings, Lock } from 'lucide-react';
+import { FileText, Wrench, LogOut, Download, Share2, X, Eye, EyeOff, Settings, Lock, Camera, ImagePlus } from 'lucide-react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Certificate } from './types';
 import { generateCertificatePDF } from './utils/pdfGenerator';
@@ -488,10 +488,17 @@ function CertificateForm() {
             ))}
             <label className="aspect-square bg-zinc-50 border-2 border-dashed border-zinc-300 hover:border-red-400 hover:bg-red-50/30 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group">
               <div className="bg-white p-3 rounded-full shadow-sm group-hover:scale-110 transition-transform mb-2 text-red-500">
-                <Wrench className="w-5 h-5"/>
+                <Camera className="w-5 h-5"/>
               </div>
-              <span className="text-xs text-zinc-500 font-bold uppercase tracking-wider group-hover:text-red-600">Adicionar</span>
-              <input type="file" multiple accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
+              <span className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider group-hover:text-red-600">Câmera</span>
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoUpload} />
+            </label>
+            <label className="aspect-square bg-zinc-50 border-2 border-dashed border-zinc-300 hover:border-red-400 hover:bg-red-50/30 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group">
+              <div className="bg-white p-3 rounded-full shadow-sm group-hover:scale-110 transition-transform mb-2 text-red-500">
+                <ImagePlus className="w-5 h-5"/>
+              </div>
+              <span className="text-[10px] sm:text-xs text-zinc-500 font-bold uppercase tracking-wider group-hover:text-red-600">Galeria</span>
+              <input type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </label>
           </div>
         </section>
