@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Francisco Mecânico",
+  "description": "App para gerar certificados de revisão e entrega de motos",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
