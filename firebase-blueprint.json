@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "Certificate": {
+      "title": "Service Certificate",
+      "description": "A certificate for motorcycle repair service",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "certificateNumber": { "type": "string" },
+        "clientName": { "type": "string" },
+        "motoModel": { "type": "string" },
+        "motoMileage": { "type": "string" },
+        "laborValue": { "type": "number" },
+        "partsValue": { "type": "number" },
+        "totalValue": { "type": "number" },
+        "partsReplaced": { "type": "array", "items": { "type": "string" } },
+        "servicesPerformed": { "type": "string" },
+        "observations": { "type": "string" },
+        "photoUrls": { "type": "array", "items": { "type": "string" } },
+        "pdfUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "clientName", "motoModel", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/certificates/{certificateId}": {
+      "schema": { "$ref": "#/entities/Certificate" },
+      "description": "Stores all generated service certificates."
+    }
+  }
+}

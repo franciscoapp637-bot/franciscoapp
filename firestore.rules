@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidCertificate(data) {
+      return data.keys().hasAll(['clientName', 'motoModel', 'createdAt', 'userId']) &&
+             data.clientName is string && data.clientName.size() <= 200 &&
+             data.motoModel is string && data.motoModel.size() <= 200;
+    }
+
+    match /certificates/{certificateId} {
+      allow read: if true;
+      allow create: if isValidId(certificateId) && isValidCertificate(incoming());
+      allow update: if isValidCertificate(incoming());
+      allow delete: if true;
+    }
+  }
+}
